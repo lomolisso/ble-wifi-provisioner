@@ -13,8 +13,7 @@ from . import transport
 TAG = "BLEWiFiProvisioner"
 
 class BLEWiFiProvisioner:
-    def __init__(self, pop, wifi_ssid, wifi_passphrase, iface, verbose=False):
-        self.pop = pop
+    def __init__(self, wifi_ssid, wifi_passphrase, iface, verbose=False):
         self.ssid = wifi_ssid
         self.passphrase = wifi_passphrase
         self.iface = iface
@@ -43,8 +42,8 @@ class BLEWiFiProvisioner:
                     })
         return filtered_devices
     
-    async def connect(self, device_name, device_address):
-        self._init_security()
+    async def connect(self, device_name, device_address, device_pop):
+        self._init_security(pop=device_pop)
         try:
             await self._tp.connect(devname=device_name, devaddr=device_address)
         except RuntimeError as e:
@@ -165,8 +164,8 @@ class BLEWiFiProvisioner:
         self._logger.addHandler(handler)
         self._logger.setLevel(logging.INFO)
 
-    def _init_security(self):
-        self._sec = security.Security1(self.pop, self.verbose)
+    def _init_security(self, pop):
+        self._sec = security.Security1(pop, self.verbose)
 
     def _init_transport(self, iface="hci0"):
         self._tp = transport.Transport_BLE(iface=iface, verbose=self.verbose)
